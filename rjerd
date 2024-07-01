@@ -124,29 +124,6 @@ usernameLabel.TextScaled = true
 usernameLabel.TextSize = 48 -- Set a smaller text size
 usernameLabel.Parent = screenGui
 
--- Create the Made By Zerobaki TextLabel
-local madeByLabel = Instance.new("TextLabel")
-madeByLabel.Size = UDim2.new(1, 0, 0.25, 0) -- Adjusted to take one-fourth of the screen height
-madeByLabel.Position = UDim2.new(0, 0, 0.5, 0) -- Positioned in the middle
-madeByLabel.BackgroundTransparency = 1
-madeByLabel.Font = Enum.Font.Gotham -- Gotham is a clean, sans-serif font similar to Noto Sans
-madeByLabel.Text = "Made By Zerobaki"
-madeByLabel.TextColor3 = Color3.new(1, 1, 1) -- White text color
-madeByLabel.TextScaled = true
-madeByLabel.TextSize = 48 -- Set a smaller text size
-madeByLabel.Parent = screenGui
-
--- Create the Initializing TextLabel
-local initializingLabel = Instance.new("TextLabel")
-initializingLabel.Size = UDim2.new(1, 0, 0.25, 0) -- Adjusted to take one-fourth of the screen height
-initializingLabel.Position = UDim2.new(0, 0, 0.75, 0) -- Positioned below the made by message
-initializingLabel.BackgroundTransparency = 1
-initializingLabel.Font = Enum.Font.Gotham -- Gotham is a clean, sans-serif font similar to Noto Sans
-initializingLabel.Text = "Initializing ZeroHub"
-initializingLabel.TextColor3 = Color3.new(1, 1, 1) -- White text color
-initializingLabel.TextScaled = true
-initializingLabel.TextSize = 48 -- Set a smaller text size
-initializingLabel.Parent = screenGui
 
 -- TweenService for smooth transition
 local tweenService = game:GetService("TweenService")

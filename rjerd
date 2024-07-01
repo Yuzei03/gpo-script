@@ -124,21 +124,16 @@ usernameLabel.TextScaled = true
 usernameLabel.TextSize = 48 -- Set a smaller text size
 usernameLabel.Parent = screenGui
 
-
 -- TweenService for smooth transition
 local tweenService = game:GetService("TweenService")
 local tweenInfo = TweenInfo.new(1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
 local tween = tweenService:Create(welcomeLabel, tweenInfo, {TextTransparency = 1})
 local tweenUsername = tweenService:Create(usernameLabel, tweenInfo, {TextTransparency = 1})
-local tweenMadeBy = tweenService:Create(madeByLabel, tweenInfo, {TextTransparency = 1})
-local tweenInit = tweenService:Create(initializingLabel, tweenInfo, {TextTransparency = 1})
 
 -- Function to remove the welcome screen and blur effect
 local function removeWelcomeScreen()
     tween:Play()
     tweenUsername:Play()
-    tweenMadeBy:Play()
-    tweenInit:Play()
     tween.Completed:Connect(function()
         screenGui:Destroy()
         blurEffect:Destroy()

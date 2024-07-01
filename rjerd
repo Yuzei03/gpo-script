@@ -91,6 +91,7 @@ end)
 
 -- Start the function in a separate thread
 spawn(keepFeetOnGround)
+
 -- Create the blur effect
 local blurEffect = Instance.new("BlurEffect")
 blurEffect.Size = 24
@@ -100,24 +101,67 @@ blurEffect.Parent = game.Lighting
 local screenGui = Instance.new("ScreenGui")
 screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
 
--- Create the TextLabel
+-- Create the Welcome TextLabel
 local welcomeLabel = Instance.new("TextLabel")
-welcomeLabel.Size = UDim2.new(1, 0, 1, 0)
+welcomeLabel.Size = UDim2.new(1, 0, 0.25, 0) -- Adjusted to take one-fourth of the screen height
 welcomeLabel.BackgroundTransparency = 1
 welcomeLabel.Font = Enum.Font.Gotham -- Gotham is a clean, sans-serif font similar to Noto Sans
 welcomeLabel.Text = "Welcome To Zero Hub"
 welcomeLabel.TextColor3 = Color3.new(1, 1, 1) -- White text color
 welcomeLabel.TextScaled = true
+welcomeLabel.TextSize = 48 -- Set a smaller text size
 welcomeLabel.Parent = screenGui
+
+-- Create the Username TextLabel
+local usernameLabel = Instance.new("TextLabel")
+usernameLabel.Size = UDim2.new(1, 0, 0.25, 0) -- Adjusted to take one-fourth of the screen height
+usernameLabel.Position = UDim2.new(0, 0, 0.25, 0) -- Positioned below the welcome message
+usernameLabel.BackgroundTransparency = 1
+usernameLabel.Font = Enum.Font.Gotham -- Gotham is a clean, sans-serif font similar to Noto Sans
+usernameLabel.Text = game.Players.LocalPlayer.Name
+usernameLabel.TextColor3 = Color3.new(1, 1, 1) -- White text color
+usernameLabel.TextScaled = true
+usernameLabel.TextSize = 48 -- Set a smaller text size
+usernameLabel.Parent = screenGui
+
+-- Create the Made By Zerobaki TextLabel
+local madeByLabel = Instance.new("TextLabel")
+madeByLabel.Size = UDim2.new(1, 0, 0.25, 0) -- Adjusted to take one-fourth of the screen height
+madeByLabel.Position = UDim2.new(0, 0, 0.5, 0) -- Positioned in the middle
+madeByLabel.BackgroundTransparency = 1
+madeByLabel.Font = Enum.Font.Gotham -- Gotham is a clean, sans-serif font similar to Noto Sans
+madeByLabel.Text = "Made By Zerobaki"
+madeByLabel.TextColor3 = Color3.new(1, 1, 1) -- White text color
+madeByLabel.TextScaled = true
+madeByLabel.TextSize = 48 -- Set a smaller text size
+madeByLabel.Parent = screenGui
+
+-- Create the Initializing TextLabel
+local initializingLabel = Instance.new("TextLabel")
+initializingLabel.Size = UDim2.new(1, 0, 0.25, 0) -- Adjusted to take one-fourth of the screen height
+initializingLabel.Position = UDim2.new(0, 0, 0.75, 0) -- Positioned below the made by message
+initializingLabel.BackgroundTransparency = 1
+initializingLabel.Font = Enum.Font.Gotham -- Gotham is a clean, sans-serif font similar to Noto Sans
+initializingLabel.Text = "Initializing ZeroHub"
+initializingLabel.TextColor3 = Color3.new(1, 1, 1) -- White text color
+initializingLabel.TextScaled = true
+initializingLabel.TextSize = 48 -- Set a smaller text size
+initializingLabel.Parent = screenGui
 
 -- TweenService for smooth transition
 local tweenService = game:GetService("TweenService")
 local tweenInfo = TweenInfo.new(1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
 local tween = tweenService:Create(welcomeLabel, tweenInfo, {TextTransparency = 1})
+local tweenUsername = tweenService:Create(usernameLabel, tweenInfo, {TextTransparency = 1})
+local tweenMadeBy = tweenService:Create(madeByLabel, tweenInfo, {TextTransparency = 1})
+local tweenInit = tweenService:Create(initializingLabel, tweenInfo, {TextTransparency = 1})
 
 -- Function to remove the welcome screen and blur effect
 local function removeWelcomeScreen()
     tween:Play()
+    tweenUsername:Play()
+    tweenMadeBy:Play()
+    tweenInit:Play()
     tween.Completed:Connect(function()
         screenGui:Destroy()
         blurEffect:Destroy()
@@ -127,3 +171,4 @@ end
 -- Wait for 3 seconds before removing the welcome screen
 wait(3)
 removeWelcomeScreen()
+

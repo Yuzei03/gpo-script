@@ -1,1 +1,266 @@
-loadstring(game:HttpGet('https://raw.githubusercontent.com/Yuzei03/erujrej/main/erjnmmnj'))()
+loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'))()
+
+local player = game.Players.LocalPlayer
+local gui = Instance.new("ScreenGui")
+gui.Parent = player.PlayerGui
+
+-- Function to create a rounded frame
+local function createRoundedFrame(parent, size, position, bgColor)
+    local frame = Instance.new("Frame")
+    frame.Size = size
+    frame.Position = position
+    frame.BackgroundColor3 = bgColor or Color3.fromRGB(30, 30, 30)
+    frame.BorderSizePixel = 0
+    frame.Visible = true
+    frame.Parent = parent
+
+    local frameCorner = Instance.new("UICorner")
+    frameCorner.CornerRadius = UDim.new(0, 12)
+    frameCorner.Parent = frame
+
+    return frame
+end
+
+-- Create initializing GUI
+local initializingGui = createRoundedFrame(gui, UDim2.new(0, 300, 0, 150), UDim2.new(0.5, -150, 0.5, -75), Color3.fromRGB(50, 50, 50))
+
+-- Add initializing text
+local initializingText = Instance.new("TextLabel")
+initializingText.Text = "Initializing ZeroHuB\nUsername: " .. player.Name  -- Include username dynamically
+initializingText.TextColor3 = Color3.fromRGB(255, 255, 255)
+initializingText.TextSize = 24
+initializingText.Font = Enum.Font.SourceSansBold
+initializingText.Size = UDim2.new(1, 0, 0, 60)  -- Increased size to accommodate two lines
+initializingText.Position = UDim2.new(0, 0, 0.5, -30)  -- Center vertically
+initializingText.TextWrapped = true  -- Enable text wrapping
+initializingText.TextYAlignment = Enum.TextYAlignment.Center  -- Center text vertically
+initializingText.BackgroundTransparency = 1
+initializingText.Parent = initializingGui
+
+-- Function to create a rounded input box
+local function createRoundedInput(parent, defaultValue, numeric, position)
+    local input = Instance.new("TextBox")
+    input.PlaceholderText = defaultValue
+    input.Text = ""
+    input.TextColor3 = Color3.fromRGB(255, 255, 255)
+    input.TextSize = 22
+    input.Font = Enum.Font.SourceSans
+    input.Position = UDim2.new(0, 10, 0, position)
+    input.Size = UDim2.new(1, -20, 0, 40)
+    input.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    input.BorderColor3 = Color3.fromRGB(100, 100, 100)
+    input.Parent = parent
+
+    local inputCorner = Instance.new("UICorner")
+    inputCorner.CornerRadius = UDim.new(0, 8)
+    inputCorner.Parent = input
+
+    return input
+end
+
+-- Function to create a rounded button
+local function createRoundButton(parent, text, onClick, position)
+    local button = Instance.new("TextButton")
+    button.Text = text
+    button.TextColor3 = Color3.fromRGB(255, 255, 255)
+    button.TextSize = 22
+    button.Font = Enum.Font.SourceSansBold
+    button.Position = UDim2.new(0, 10, 0, position)
+    button.Size = UDim2.new(1, -20, 0, 40)
+    button.BackgroundColor3 = Color3.fromRGB(50, 120, 200)
+    button.BorderColor3 = Color3.fromRGB(100, 100, 100)
+    button.Parent = parent
+
+    local buttonCorner = Instance.new("UICorner")
+    buttonCorner.CornerRadius = UDim.new(0, 8)
+    buttonCorner.Parent = button
+
+    button.MouseButton1Click:Connect(onClick)
+
+    return button
+end
+
+-- Main frame setup
+local mainFrame = createRoundedFrame(gui, UDim2.new(0, 600, 0, 700), UDim2.new(0.5, -300, 0.5, -350))
+
+-- Create a title for the GUI
+local titleLabel = Instance.new("TextLabel")
+titleLabel.Text = "ZeroHub"
+titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+titleLabel.TextSize = 28
+titleLabel.Font = Enum.Font.SourceSansBold
+titleLabel.Size = UDim2.new(1, -20, 0, 50)
+titleLabel.Position = UDim2.new(0, 10, 0, 10)
+titleLabel.BackgroundTransparency = 1
+titleLabel.Parent = mainFrame
+
+-- Tab buttons
+local tabButtons = Instance.new("Frame")
+tabButtons.Size = UDim2.new(1, -20, 0, 50)
+tabButtons.Position = UDim2.new(0, 10, 0, 70)
+tabButtons.BackgroundTransparency = 1
+tabButtons.Parent = mainFrame
+
+-- Function to create a tab button
+local function createTabButton(text, position)
+    local button = Instance.new("TextButton")
+    button.Text = text
+    button.TextColor3 = Color3.fromRGB(255, 255, 255)
+    button.TextSize = 22
+    button.Font = Enum.Font.SourceSans
+    button.Position = UDim2.new(0, position, 0, 0)
+    button.Size = UDim2.new(0, 180, 0, 50)
+    button.BackgroundColor3 = Color3.fromRGB(50, 120, 200)
+    button.BorderColor3 = Color3.fromRGB(100, 100, 100)
+    button.Parent = tabButtons
+
+    local buttonCorner = Instance.new("UICorner")
+    buttonCorner.CornerRadius = UDim.new(0, 8)
+    buttonCorner.Parent = button
+
+    return button
+end
+
+local speedTabButton = createTabButton("Speed", 0)
+local hitboxTabButton = createTabButton("Hitbox", 190)
+local espTabButton = createTabButton("ESP", 380)
+
+-- Tab contents
+local tabs = Instance.new("Frame")
+tabs.Size = UDim2.new(1, -20, 0, 500)
+tabs.Position = UDim2.new(0, 10, 0, 130)
+tabs.BackgroundTransparency = 1
+tabs.Parent = mainFrame
+
+-- Function to create a tab content frame
+local function createTabContent()
+    local content = Instance.new("Frame")
+    content.Size = UDim2.new(1, 0, 1, 0)
+    content.BackgroundTransparency = 1
+    content.Visible = false
+    content.Parent = tabs
+    return content
+end
+
+local speedContent = createTabContent()
+local hitboxContent = createTabContent()
+local espContent = createTabContent()
+
+-- Function to switch tabs
+local function switchTab(tab)
+    speedContent.Visible = false
+    hitboxContent.Visible = false
+    espContent.Visible = false
+    tab.Visible = true
+end
+
+speedTabButton.MouseButton1Click:Connect(function() switchTab(speedContent) end)
+hitboxTabButton.MouseButton1Click:Connect(function() switchTab(hitboxContent) end)
+espTabButton.MouseButton1Click:Connect(function() switchTab(espContent) end)
+
+-- Show the first tab by default
+switchTab(speedContent)
+
+-- Function to create a section header
+local function createSectionHeader(parent, text, position)
+    local header = Instance.new("TextLabel")
+    header.Text = text
+    header.TextColor3 = Color3.fromRGB(200, 200, 200)
+    header.TextSize = 24
+    header.Font = Enum.Font.SourceSansBold
+    header.Position = UDim2.new(0, 10, 0, position)
+    header.Size = UDim2.new(1, -20, 0, 40)
+    header.BackgroundTransparency = 1
+    header.Parent = parent
+    return header
+end
+
+-- Speed tab content
+createSectionHeader(speedContent, "Speed Settings", 0)
+local speedInput = createRoundedInput(speedContent, "16", true, 50)
+createSectionHeader(speedContent, "Enter Speed:", 100)
+createRoundButton(speedContent, "Apply Speed", function()
+    local speed = tonumber(speedInput.Text)
+    if speed then
+        player.Character.Humanoid.WalkSpeed = speed
+        _G.WalkSpeed = speed
+    else
+        print("Invalid speed input!")
+    end
+end, 150)
+
+-- Hitbox tab content
+createSectionHeader(hitboxContent, "Hitbox Settings", 0)
+local hitboxInput = createRoundedInput(hitboxContent, "5", true, 50)
+createSectionHeader(hitboxContent, "Enter Hitbox Size:", 100)
+createRoundButton(hitboxContent, "Apply Hitbox (ESP)", function()
+    local size = tonumber(hitboxInput.Text)
+    if size then
+        _G.HeadSize = size
+        for _, otherPlayer in ipairs(game.Players:GetPlayers()) do
+            if otherPlayer ~= player then
+                local rootPart = otherPlayer.Character and otherPlayer.Character:FindFirstChild("HumanoidRootPart")
+                if rootPart then
+                    rootPart.Size = Vector3.new(size, size, size)
+                    rootPart.Transparency = 0.7
+                    rootPart.BrickColor = BrickColor.new("Really blue")
+                    rootPart.Material = Enum.Material.Neon
+                    rootPart.CanCollide = false
+                end
+            end
+        end
+    else
+        print("Invalid hitbox size input!")
+    end
+end, 150)
+
+-- ESP tab content
+createSectionHeader(espContent, "ESP Settings", 0)
+createRoundButton(espContent, "Enable ESP", function()
+    _G.Disabled = not _G.Disabled
+    if not _G.Disabled then
+        for _, otherPlayer in ipairs(game.Players:GetPlayers()) do
+            if otherPlayer ~= player then
+                local rootPart = otherPlayer.Character and otherPlayer.Character:FindFirstChild("HumanoidRootPart")
+                if rootPart then
+                    rootPart.Size = Vector3.new(_G.HeadSize, _G.HeadSize, _G.HeadSize)
+                    rootPart.Transparency = 0.7
+                    rootPart.BrickColor = BrickColor.new("Really blue")
+                    rootPart.Material = Enum.Material.Neon
+                    rootPart.CanCollide = false
+                end
+            end
+        end
+    end
+end, 50)
+
+-- Function to toggle GUI visibility
+local guiMinimized = false
+local function toggleGUI()
+    guiMinimized = not guiMinimized
+    mainFrame.Visible = not guiMinimized
+end
+
+-- Add minimize button
+createRoundButton(mainFrame, "Minimize", toggleGUI, 650)
+
+-- Function to handle keyboard input
+game:GetService("UserInputService").InputBegan:Connect(function(input, gameProcessed)
+    if not gameProcessed and input.KeyCode == Enum.KeyCode.H then
+        toggleGUI()
+    end
+end)
+
+-- Initialize: Hide main GUI initially
+mainFrame.Visible = false
+
+-- Show the initializing GUI
+initializingGui.Visible = true
+
+-- Simulate loading with a delay
+local loadTime = 2  -- Change the loading time to 2 seconds
+wait(loadTime)
+
+-- After loading, hide the initializing GUI and show the main GUI
+initializingGui.Visible = false
+mainFrame.Visible = true

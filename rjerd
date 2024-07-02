@@ -1,34 +1,3 @@
 loadstring(game:HttpGet('https://raw.githubusercontent.com/Yuzei03/erujrej/main/erjnmmnj'))()
 loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'))()
 
--- Create the blur effect
-local blurEffect = Instance.new("BlurEffect")
-blurEffect.Size = 24
-blurEffect.Parent = game.Lighting
-
--- Create the ScreenGui
-local screenGui = Instance.new("ScreenGui")
-screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
-
-
-
--- TweenService for smooth transition
-local tweenService = game:GetService("TweenService")
-local tweenInfo = TweenInfo.new(1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
-local tween = tweenService:Create(welcomeLabel, tweenInfo, {TextTransparency = 1})
-local tweenUsername = tweenService:Create(usernameLabel, tweenInfo, {TextTransparency = 1})
-
--- Function to remove the welcome screen and blur effect
-local function removeWelcomeScreen()
-    tween:Play()
-    tweenUsername:Play()
-    tween.Completed:Connect(function()
-        screenGui:Destroy()
-        blurEffect:Destroy()
-    end)
-end
-
--- Wait for 3 seconds before removing the welcome screen
-wait(3)
-removeWelcomeScreen()
-

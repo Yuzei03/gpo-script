@@ -1,3 +1,4 @@
+-- Load ZeroHuB using Infinite Yield's script loader
 loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'))()
 
 local player = game.Players.LocalPlayer
@@ -85,7 +86,7 @@ local mainFrame = createRoundedFrame(gui, UDim2.new(0, 600, 0, 700), UDim2.new(0
 
 -- Create a title for the GUI
 local titleLabel = Instance.new("TextLabel")
-titleLabel.Text = "ZeroHub"
+titleLabel.Text = "ZeroHuB"
 titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 titleLabel.TextSize = 28
 titleLabel.Font = Enum.Font.SourceSansBold
@@ -191,13 +192,26 @@ end, 150)
 
 -- Hitbox tab content
 createSectionHeader(hitboxContent, "Hitbox Settings", 0)
-local hitboxInput = createRoundedInput(hitboxContent, "5", true, 50)
+local hitboxInput = createRoundedInput(hitboxContent, "35", true, 50)
 createSectionHeader(hitboxContent, "Enter Hitbox Size:", 100)
-createRoundButton(hitboxContent, "Apply Hitbox (Head)", function()
+createRoundButton(hitboxContent, "Apply Hitbox", function()
     local size = tonumber(hitboxInput.Text)
     if size then
         _G.HeadSize = size
-        _G.Disabled = false
+        _G.Disabled = not _G.Disabled  -- Toggle the disabled state
+        if not _G.Disabled then
+            for i, v in next, game:GetService('Players'):GetPlayers() do
+                if v.Name ~= game:GetService('Players').LocalPlayer.Name then
+                    pcall(function()
+                        v.Character.HumanoidRootPart.Size = Vector3.new(_G.HeadSize, _G.HeadSize, _G.HeadSize)
+                        v.Character.HumanoidRootPart.Transparency = 0.7
+                        v.Character.HumanoidRootPart.BrickColor = BrickColor.new("Really blue")
+                        v.Character.HumanoidRootPart.Material = "Neon"
+                        v.Character.HumanoidRootPart.CanCollide = false
+                    end)
+                end
+            end
+        end
     else
         print("Invalid hitbox size input!")
     end
@@ -208,7 +222,7 @@ createSectionHeader(espContent, "ESP Settings", 0)
 createRoundButton(espContent, "T to Enable", function()
     _G.Disabled = not _G.Disabled
     if not _G.Disabled then
-        for i,v in next, game:GetService('Players'):GetPlayers() do
+        for i, v in next, game:GetService('Players'):GetPlayers() do
             if v.Name ~= game:GetService('Players').LocalPlayer.Name then
                 pcall(function()
                     v.Character.Head.Size = Vector3.new(_G.HeadSize, _G.HeadSize, _G.HeadSize)
@@ -223,7 +237,7 @@ createRoundButton(espContent, "T to Enable", function()
 end, 50)
 
 -- Hitbox expanding logic
-_G.HeadSize = 5
+_G.HeadSize = 35
 _G.Disabled = true
 
 game:GetService('RunService').RenderStepped:Connect(function()
@@ -231,14 +245,25 @@ game:GetService('RunService').RenderStepped:Connect(function()
         for i, v in next, game:GetService('Players'):GetPlayers() do
             if v.Name ~= game:GetService('Players').LocalPlayer.Name then
                 pcall(function()
-                    v.Character.Head.Size = Vector3.new(_G.HeadSize, _G.HeadSize, _G.HeadSize)
-                    v.Character.Head.Transparency = 0.7
-                    v.Character.Head.BrickColor = BrickColor.new("Really blue")
-                    v.Character.Head.Material = "Neon"
-                    v.Character.Head.CanCollide = false
+                    v.Character.HumanoidRootPart.Size = Vector3.new(_G.HeadSize, _G.HeadSize, _G.HeadSize)
+                    v.Character.HumanoidRootPart.Transparency = 0.7
+                    v.Character.HumanoidRootPart.BrickColor = BrickColor.new("Really blue")
+                    v.Character.HumanoidRootPart.Material = "Neon"
+                    v.Character.HumanoidRootPart.CanCollide = false
                 end)
             end
         end
+    end
+end)
+
+-- Toggle visibility of GUI with 'H' key
+local function toggleGuiVisibility()
+    gui.Enabled = not gui.Enabled
+end
+
+game:GetService("UserInputService").InputBegan:Connect(function(input)
+    if input.KeyCode == Enum.KeyCode.H then
+        toggleGuiVisibility()
     end
 end)
 

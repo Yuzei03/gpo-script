@@ -1,4 +1,4 @@
-loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'))()
+
 
 local player = game.Players.LocalPlayer
 local gui = Instance.new("ScreenGui")

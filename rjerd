@@ -193,19 +193,19 @@ end, 150)
 createSectionHeader(hitboxContent, "Hitbox Settings", 0)
 local hitboxInput = createRoundedInput(hitboxContent, "5", true, 50)
 createSectionHeader(hitboxContent, "Enter Hitbox Size:", 100)
-createRoundButton(hitboxContent, "Apply Hitbox ", function()
+createRoundButton(hitboxContent, "Apply Hitbox (ESP)", function()
     local size = tonumber(hitboxInput.Text)
     if size then
-        _G.HeadSize = size
+        _G.HitboxSize = size
         for _, otherPlayer in ipairs(game.Players:GetPlayers()) do
             if otherPlayer ~= player then
-                local rootPart = otherPlayer.Character and otherPlayer.Character:FindFirstChild("HumanoidRootPart")
-                if rootPart then
-                    rootPart.Size = Vector3.new(size, size, size)
-                    rootPart.Transparency = 0.7
-                    rootPart.BrickColor = BrickColor.new("Really blue")
-                    rootPart.Material = Enum.Material.Neon
-                    rootPart.CanCollide = false
+                local torso = otherPlayer.Character and (otherPlayer.Character:FindFirstChild("Torso") or otherPlayer.Character:FindFirstChild("UpperTorso"))
+                if torso then
+                    torso.Size = Vector3.new(size, size, size)
+                    torso.Transparency = 0.7
+                    torso.BrickColor = BrickColor.new("Really blue")
+                    torso.Material = Enum.Material.Neon
+                    torso.CanCollide = false
                 end
             end
         end
@@ -213,6 +213,7 @@ createRoundButton(hitboxContent, "Apply Hitbox ", function()
         print("Invalid hitbox size input!")
     end
 end, 150)
+
 
 -- ESP tab content
 createSectionHeader(espContent, "ESP Settings", 0)

@@ -1,19 +1,123 @@
+--[[
+	WARNING: Heads up! This script has not been verified by ScriptBlox. Use at your own risk!
+]]
+-- Initialization
+local cloneref = cloneref or function(...) return ... end
+
+local Players = cloneref(game:GetService("Players"))
+local lp = Players.LocalPlayer
+
+local flying = false
+local bv, bav
+local buttons = {W = false, S = false, A = false, D = false, Moving = false}
+
+local function StartFly()
+    if not lp.Character then return end
+    local c = lp.Character
+    local h = c:FindFirstChildOfClass("Humanoid")
+    if not h or flying then return end
+
+    h.PlatformStand = true
+    local cam = workspace.CurrentCamera
+
+    bv = Instance.new("BodyVelocity")
+    bav = Instance.new("BodyAngularVelocity")
+
+    bv.Velocity, bv.MaxForce, bv.P = Vector3.new(0, 0, 0), Vector3.new(10000, 10000, 10000), 1000
+    bav.AngularVelocity, bav.MaxTorque, bav.P = Vector3.new(0, 0, 0), Vector3.new(10000, 10000, 10000), 1000
+    bv.Parent = c.Head
+    bav.Parent = c.Head
+
+    flying = true
+
+    h.Died:connect(function() 
+        EndFly()
+    end)
+end
+
+local function EndFly()
+    if bv then bv:Destroy() end
+    if bav then bav:Destroy() end
+
+    local c = lp.Character
+    local h = c and c:FindFirstChildOfClass("Humanoid")
+    if h then h.PlatformStand = false end
+
+    flying = false
+end
+
+game:GetService("UserInputService").InputBegan:connect(function(input, GPE)
+    if GPE then return end
+    
+    if input.KeyCode == Enum.KeyCode.F then
+        if flying then
+            EndFly()
+        else
+            StartFly()
+        end
+    else
+        for i, e in pairs(buttons) do
+            if i ~= "Moving" and input.KeyCode == Enum.KeyCode[i] then
+                buttons[i] = true
+                buttons.Moving = true
+            end
+        end
+    end
+end)
+
+game:GetService("UserInputService").InputEnded:connect(function(input, GPE)
+    if GPE then return end
+    local a = false
+    for i, e in pairs(buttons) do
+        if i ~= "Moving" then
+            if input.KeyCode == Enum.KeyCode[i] then
+                buttons[i] = false
+            end
+            if buttons[i] then a = true end
+        end
+    end
+    buttons.Moving = a
+end)
+
+local function setVec(vec)
+    return vec * ((getgenv().FlySpeed or 50) / vec.Magnitude)
+end
+
+game:GetService("RunService").Heartbeat:connect(function(step)
+    local c = cloneref(lp.Character)
+    if flying and c and c.PrimaryPart then
+        local p = c.PrimaryPart.Position
+        local cf = workspace.CurrentCamera.CFrame
+        local ax, ay, az = cf:toEulerAnglesXYZ()
+        c:SetPrimaryPartCFrame(CFrame.new(p.x, p.y, p.z) * CFrame.Angles(ax, ay, az))
+        if buttons.Moving then
+            local t = Vector3.new()
+            if buttons.W then t = t + (setVec(cf.lookVector)) end
+            if buttons.S then t = t - (setVec(cf.lookVector)) end
+            if buttons.A then t = t - (setVec(cf.rightVector)) end
+            if buttons.D then t = t + (setVec(cf.rightVector)) end
+            c:TranslateBy(t * step)
+        end
+    end
+end)
+
+-- Load Linoria library and addons
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/violin-suzutsuki/LinoriaLib/main/Library.lua"))()
 local ThemeManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/violin-suzutsuki/LinoriaLib/main/addons/ThemeManager.lua"))()
 local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/violin-suzutsuki/LinoriaLib/main/addons/SaveManager.lua"))()
 
 -- Create the main window
 local Window = Library:CreateWindow({
-    Title = 'ZeroHuB',
+    Title = 'GPO BR',
     Center = true,
     AutoShow = true,
 })
 
--- Create a tab named "Main"
-local MainTab = Window:AddTab('Main')
+-- Create a tab named "GPO BR"
+local GPOTab = Window:AddTab('GPO BR')
 
--- Add a tabbox for speed settings within the "Main" tab
-local SpeedTabbox = MainTab:AddLeftTabbox('Speed')
+-- Add a tabbox for speed settings within the "GPO BR" tab
+local SpeedTabbox = GPOTab:AddLeftTabbox('Speed')
 
 -- Add a tab to the tabbox for speed settings
 local SpeedTab = SpeedTabbox:AddTab('Speed Settings')
@@ -54,7 +158,7 @@ local function hideMainGUI()
         ShowButton.MouseButton1Click:Connect(function()
             ShowButton:Destroy()
             ShowButton = nil
-            loadstring(game:HttpGet('https://raw.githubusercontent.com/Yuzei03/gpo-script/main/rjerd'))()
+            loadstring(game:HttpGet('https://raw.githubusercontent.com/your-username/your-repo/main/your-script.lua'))()
         end)
     end
 end
@@ -63,7 +167,7 @@ end
 SpeedTab:AddButton('Hide GUI', hideMainGUI)
 
 -- Add a tabbox for hitbox settings
-local HitboxTabbox = MainTab:AddLeftTabbox('Hitbox')
+local HitboxTabbox = GPOTab:AddLeftTabbox('Hitbox')
 
 -- Add a tab to the hitbox tabbox for hitbox settings
 local HitboxTab = HitboxTabbox:AddTab('Hitbox Settings')
@@ -98,7 +202,7 @@ HitboxTab:AddButton('Apply Hitbox (ESP)', function()
 end)
 
 -- Add a tabbox for ESP settings
-local ESPTabbox = MainTab:AddRightTabbox('ESP')
+local ESPTabbox = GPOTab:AddRightTabbox('ESP')
 
 -- Add a tab to the ESP tabbox for ESP settings
 local ESPTab = ESPTabbox:AddTab('ESP Settings')
@@ -156,22 +260,6 @@ EnableESP:OnChanged(function()
     end
 end)
 
--- Add a tabbox for Fly settings aligned with ESP on the right side
-local FlyTabbox = ESPTabbox:AddRightTabbox('Fly')
-
--- Add a tab to the Fly tabbox for Fly settings
-local FlyTab = FlyTabbox:AddTab('Fly Settings')
-
--- Add a button to toggle Fly
-FlyTab:AddButton('Toggle Fly', function()
-    local player = game.Players.LocalPlayer
-    local character = player.Character
-    local humanoid = character and character:FindFirstChild("Humanoid")
-    if humanoid then
-        humanoid.PlatformStand = not humanoid.PlatformStand
-    end
-end)
-
 -- Replace ESP functionality with rendering through walls
 _G.HeadSize = 5
 _G.Disabled = true
@@ -195,33 +283,155 @@ game:GetService('RunService').RenderStepped:Connect(function()
     end
 end)
 
--- Apply initial settings and start maintaining speed
-Library:SetWatermarkVisibility(true)
-Library:SetWatermark('GPO BR')
+-- Add a tabbox for Fly settings
+local FlyTabbox = GPOTab:AddRightTabbox('Fly')
 
-ThemeManager:SetLibrary(Library)
-SaveManager:SetLibrary(Library)
+-- Add a tab to the Fly tabbox for Fly settings
+local FlyTab = FlyTabbox:AddTab('Fly Settings')
 
-ThemeManager:ApplyToTab(Window)
-SaveManager:LoadAutoloadConfig()
+-- Add a toggle to enable/disable flying
+local EnableFly = FlyTab:AddToggle('EnableFly', {
+    Text = 'F To Fly',
+    Default = false,
+    Tooltip = 'Toggle flying ability',
+})
 
-local function maintainSpeed()
-    while true do
-        local player = game.Players.LocalPlayer
-        local character = player.Character
-        if character then
-            local humanoid = character:FindFirstChild("Humanoid")
-            if humanoid and _G.WalkSpeed then
-                if humanoid.WalkSpeed ~= _G.WalkSpeed then
-                    humanoid.WalkSpeed = _G.WalkSpeed
-                end
-            end
+-- Add a slider to adjust fly speed
+local FlySpeedSlider = FlyTab:AddSlider('FlySpeedSlider', {
+    Text = 'Fly Speed',
+    Min = 1,
+    Max = 100,
+    Default = 50,
+    Precision = 0,
+    Tooltip = 'Adjust flying speed',
+})
+
+-- Flying related variables and functions
+local flyEnabled = false
+local flySpeed = 50
+
+local function startFlying()
+    if flyEnabled then
+        return
+    end
+    
+    local character = game.Players.LocalPlayer.Character
+    if not character then
+        return
+    end
+    
+    local humanoid = character:WaitForChild("Humanoid")
+    if not humanoid then
+        return
+    end
+    
+    humanoid.PlatformStand = true
+    
+    local bodyVelocity = Instance.new("BodyVelocity")
+    bodyVelocity.Velocity = Vector3.new(0, 0, 0)
+    bodyVelocity.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+    bodyVelocity.Parent = character.HumanoidRootPart
+    
+    flyEnabled = true
+    
+    -- Handle character death to end flying
+    humanoid.Died:Connect(function()
+        endFlying()
+    end)
+    
+    while flyEnabled do
+        local forward = character.HumanoidRootPart.CFrame.LookVector
+        local right = character.HumanoidRootPart.CFrame.RightVector
+        local up = character.HumanoidRootPart.CFrame.UpVector
+
+        local moveDirection = Vector3.new()
+
+        if game:GetService("UserInputService"):IsKeyDown(Enum.KeyCode.W) then
+            moveDirection = moveDirection + forward
         end
-        wait(1) -- Check every second
+        if game:GetService("UserInputService"):IsKeyDown(Enum.KeyCode.S) then
+            moveDirection = moveDirection - forward
+        end
+        if game:GetService("UserInputService"):IsKeyDown(Enum.KeyCode.A) then
+            moveDirection = moveDirection - right
+        end
+        if game:GetService("UserInputService"):IsKeyDown(Enum.KeyCode.D) then
+            moveDirection = moveDirection + right
+        end
+        if game:GetService("UserInputService"):IsKeyDown(Enum.KeyCode.Space) then
+            moveDirection = moveDirection + up
+        end
+        if game:GetService("UserInputService"):IsKeyDown(Enum.KeyCode.LeftControl) then
+            moveDirection = moveDirection - up
+        end
+
+        bodyVelocity.Velocity = moveDirection.unit * flySpeed
+        wait(0.1)
     end
 end
 
-spawn(maintainSpeed)  -- Start maintaining speed in a separate thread
+local function endFlying()
+    if not flyEnabled then
+        return
+    end
+    
+    flyEnabled = false
+    
+    local character = game.Players.LocalPlayer.Character
+    if not character then
+        return
+    end
+    
+    local humanoid = character:WaitForChild("Humanoid")
+    if not humanoid then
+        return
+    end
+    
+    humanoid.PlatformStand = false
+    
+    local bodyVelocity = character.HumanoidRootPart:FindFirstChildOfClass("BodyVelocity")
+    if bodyVelocity then
+        bodyVelocity:Destroy()
+    end
+end
 
--- Ensure GUI starts as visible
-Window:SetVisible(true)
+-- Toggle flying on/off
+EnableFly:OnChanged(function(enabled)
+    if enabled then
+        startFlying()
+    else
+        endFlying()
+    end
+end)
+
+-- Update fly speed
+FlySpeedSlider:OnChanged(function(value)
+    flySpeed = value
+end)
+
+-- Hook into UserInputService to handle flying toggle
+game:GetService("UserInputService").InputBegan:Connect(function(input, gameProcessed)
+    if not gameProcessed then
+        if input.KeyCode == Enum.KeyCode.F then
+            EnableFly:Set(not EnableFly:Get())
+        end
+    end
+end)
+
+-- Show initializing message
+Library:CreateNotification('Initializing', {
+    'Welcome to GPO BR',
+    'Hello, ' .. game.Players.LocalPlayer.Name,
+    'Starting ...',
+})
+
+-- Function to show GUI when 'H' is pressed
+game:GetService("UserInputService").InputBegan:Connect(function(input)
+    if input.KeyCode == Enum.KeyCode.H then
+        if Library:IsLoaded() then
+            Library:Unload()
+        else
+            Window:Show()
+        end
+    end
+end)

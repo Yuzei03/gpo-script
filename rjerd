@@ -1,272 +1,227 @@
--- Load ZeroHuB using Infinite Yield's script loader
-loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'))()
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/violin-suzutsuki/LinoriaLib/main/Library.lua"))()
+local ThemeManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/violin-suzutsuki/LinoriaLib/main/addons/ThemeManager.lua"))()
+local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/violin-suzutsuki/LinoriaLib/main/addons/SaveManager.lua"))()
 
-local player = game.Players.LocalPlayer
-local gui = Instance.new("ScreenGui")
-gui.Parent = player.PlayerGui
+-- Create the main window
+local Window = Library:CreateWindow({
+    Title = 'ZeroHuB',
+    Center = true,
+    AutoShow = true,
+})
 
--- Function to create a rounded frame
-local function createRoundedFrame(parent, size, position, bgColor)
-    local frame = Instance.new("Frame")
-    frame.Size = size
-    frame.Position = position
-    frame.BackgroundColor3 = bgColor or Color3.fromRGB(30, 30, 30)
-    frame.BorderSizePixel = 0
-    frame.Visible = true
-    frame.Parent = parent
+-- Create a tab named "Main"
+local MainTab = Window:AddTab('Main')
 
-    local frameCorner = Instance.new("UICorner")
-    frameCorner.CornerRadius = UDim.new(0, 12)
-    frameCorner.Parent = frame
+-- Add a tabbox for speed settings within the "Main" tab
+local SpeedTabbox = MainTab:AddLeftTabbox('Speed')
 
-    return frame
-end
+-- Add a tab to the tabbox for speed settings
+local SpeedTab = SpeedTabbox:AddTab('Speed Settings')
 
--- Create initializing GUI
-local initializingGui = createRoundedFrame(gui, UDim2.new(0, 300, 0, 150), UDim2.new(0.5, -150, 0.5, -75), Color3.fromRGB(50, 50, 50))
+-- Add a textbox to enter speed
+local SpeedInput = SpeedTab:AddInput('SpeedInput', {
+    Default = '16',
+    Numeric = true,
+    Finished = false,
+    Text = 'Enter Speed',
+    Tooltip = 'Set your character speed',
+})
 
--- Add initializing text
-local initializingText = Instance.new("TextLabel")
-initializingText.Text = "Initializing ZeroHuB\nUsername: " .. player.Name  -- Include username dynamically
-initializingText.TextColor3 = Color3.fromRGB(255, 255, 255)
-initializingText.TextSize = 24
-initializingText.Font = Enum.Font.SourceSansBold
-initializingText.Size = UDim2.new(1, 0, 0, 60)  -- Increased size to accommodate two lines
-initializingText.Position = UDim2.new(0, 0, 0.5, -30)  -- Center vertically
-initializingText.TextWrapped = true  -- Enable text wrapping
-initializingText.TextYAlignment = Enum.TextYAlignment.Center  -- Center text vertically
-initializingText.BackgroundTransparency = 1
-initializingText.Parent = initializingGui
+-- Add a button to apply speed
+SpeedTab:AddButton('Apply Speed', function()
+    local speed = SpeedInput.Value
+    local player = game.Players.LocalPlayer
+    local character = player.Character or player.CharacterAdded:Wait()
+    local humanoid = character:WaitForChild("Humanoid")
+    humanoid.WalkSpeed = tonumber(speed)
 
--- Function to create a rounded input box
-local function createRoundedInput(parent, defaultValue, numeric, position)
-    local input = Instance.new("TextBox")
-    input.PlaceholderText = defaultValue
-    input.Text = ""
-    input.TextColor3 = Color3.fromRGB(255, 255, 255)
-    input.TextSize = 22
-    input.Font = Enum.Font.SourceSans
-    input.Position = UDim2.new(0, 10, 0, position)
-    input.Size = UDim2.new(1, -20, 0, 40)
-    input.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-    input.BorderColor3 = Color3.fromRGB(100, 100, 100)
-    input.Parent = parent
+    -- Persist the speed in a global variable
+    _G.WalkSpeed = tonumber(speed)
+end)
 
-    local inputCorner = Instance.new("UICorner")
-    inputCorner.CornerRadius = UDim.new(0, 8)
-    inputCorner.Parent = input
+-- Create a small button to show the GUI when it's hidden
+local ShowButton
 
-    return input
-end
-
--- Function to create a rounded button
-local function createRoundButton(parent, text, onClick, position)
-    local button = Instance.new("TextButton")
-    button.Text = text
-    button.TextColor3 = Color3.fromRGB(255, 255, 255)
-    button.TextSize = 22
-    button.Font = Enum.Font.SourceSansBold
-    button.Position = UDim2.new(0, 10, 0, position)
-    button.Size = UDim2.new(1, -20, 0, 40)
-    button.BackgroundColor3 = Color3.fromRGB(50, 120, 200)
-    button.BorderColor3 = Color3.fromRGB(100, 100, 100)
-    button.Parent = parent
-
-    local buttonCorner = Instance.new("UICorner")
-    buttonCorner.CornerRadius = UDim.new(0, 8)
-    buttonCorner.Parent = button
-
-    button.MouseButton1Click:Connect(onClick)
-
-    return button
-end
-
--- Main frame setup
-local mainFrame = createRoundedFrame(gui, UDim2.new(0, 600, 0, 700), UDim2.new(0.5, -300, 0.5, -350))
-
--- Create a title for the GUI
-local titleLabel = Instance.new("TextLabel")
-titleLabel.Text = "ZeroHuB"
-titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-titleLabel.TextSize = 28
-titleLabel.Font = Enum.Font.SourceSansBold
-titleLabel.Size = UDim2.new(1, -20, 0, 50)
-titleLabel.Position = UDim2.new(0, 10, 0, 10)
-titleLabel.BackgroundTransparency = 1
-titleLabel.Parent = mainFrame
-
--- Tab buttons
-local tabButtons = Instance.new("Frame")
-tabButtons.Size = UDim2.new(1, -20, 0, 50)
-tabButtons.Position = UDim2.new(0, 10, 0, 70)
-tabButtons.BackgroundTransparency = 1
-tabButtons.Parent = mainFrame
-
--- Function to create a tab button
-local function createTabButton(text, position)
-    local button = Instance.new("TextButton")
-    button.Text = text
-    button.TextColor3 = Color3.fromRGB(255, 255, 255)
-    button.TextSize = 22
-    button.Font = Enum.Font.SourceSans
-    button.Position = UDim2.new(0, position, 0, 0)
-    button.Size = UDim2.new(0, 180, 0, 50)
-    button.BackgroundColor3 = Color3.fromRGB(50, 120, 200)
-    button.BorderColor3 = Color3.fromRGB(100, 100, 100)
-    button.Parent = tabButtons
-
-    local buttonCorner = Instance.new("UICorner")
-    buttonCorner.CornerRadius = UDim.new(0, 8)
-    buttonCorner.Parent = button
-
-    return button
-end
-
-local speedTabButton = createTabButton("Speed", 0)
-local hitboxTabButton = createTabButton("Hitbox", 190)
-local espTabButton = createTabButton("ESP", 380)
-
--- Tab contents
-local tabs = Instance.new("Frame")
-tabs.Size = UDim2.new(1, -20, 0, 500)
-tabs.Position = UDim2.new(0, 10, 0, 130)
-tabs.BackgroundTransparency = 1
-tabs.Parent = mainFrame
-
--- Function to create a tab content frame
-local function createTabContent()
-    local content = Instance.new("Frame")
-    content.Size = UDim2.new(1, 0, 1, 0)
-    content.BackgroundTransparency = 1
-    content.Visible = false
-    content.Parent = tabs
-    return content
-end
-
-local speedContent = createTabContent()
-local hitboxContent = createTabContent()
-local espContent = createTabContent()
-
--- Function to switch tabs
-local function switchTab(tab)
-    speedContent.Visible = false
-    hitboxContent.Visible = false
-    espContent.Visible = false
-    tab.Visible = true
-end
-
-speedTabButton.MouseButton1Click:Connect(function() switchTab(speedContent) end)
-hitboxTabButton.MouseButton1Click:Connect(function() switchTab(hitboxContent) end)
-espTabButton.MouseButton1Click:Connect(function() switchTab(espContent) end)
-
--- Show the first tab by default
-switchTab(speedContent)
-
--- Function to create a section header
-local function createSectionHeader(parent, text, position)
-    local header = Instance.new("TextLabel")
-    header.Text = text
-    header.TextColor3 = Color3.fromRGB(200, 200, 200)
-    header.TextSize = 24
-    header.Font = Enum.Font.SourceSansBold
-    header.Position = UDim2.new(0, 10, 0, position)
-    header.Size = UDim2.new(1, -20, 0, 40)
-    header.BackgroundTransparency = 1
-    header.Parent = parent
-    return header
-end
-
--- Speed tab content
-createSectionHeader(speedContent, "Speed Settings", 0)
-local speedInput = createRoundedInput(speedContent, "16", true, 50)
-createSectionHeader(speedContent, "Enter Speed:", 100)
-createRoundButton(speedContent, "Apply Speed", function()
-    local speed = tonumber(speedInput.Text)
-    if speed then
-        player.Character.Humanoid.WalkSpeed = speed
-        _G.WalkSpeed = speed
-    else
-        print("Invalid speed input!")
+-- Function to hide the main GUI and show the small button
+local function hideMainGUI()
+    Library:Unload()
+    if not ShowButton then
+        ShowButton = Instance.new("TextButton")
+        ShowButton.Size = UDim2.new(0, 100, 0, 30)
+        ShowButton.Position = UDim2.new(0, 10, 0, 10)
+        ShowButton.Text = "Show GUI"
+        ShowButton.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+        ShowButton.MouseButton1Click:Connect(function()
+            ShowButton:Destroy()
+            ShowButton = nil
+            loadstring(game:HttpGet('https://raw.githubusercontent.com/Yuzei03/gpo-script/main/rjerd'))()
+        end)
     end
-end, 150)
+end
 
--- Hitbox tab content
-createSectionHeader(hitboxContent, "Hitbox Settings", 0)
-local hitboxInput = createRoundedInput(hitboxContent, "35", true, 50)
-createSectionHeader(hitboxContent, "Enter Hitbox Size:", 100)
-createRoundButton(hitboxContent, "Apply Hitbox", function()
-    local size = tonumber(hitboxInput.Text)
-    if size then
-        _G.HeadSize = size
-        _G.Disabled = not _G.Disabled  -- Toggle the disabled state
-        if not _G.Disabled then
-            for i, v in next, game:GetService('Players'):GetPlayers() do
-                if v.Name ~= game:GetService('Players').LocalPlayer.Name then
-                    pcall(function()
-                        v.Character.HumanoidRootPart.Size = Vector3.new(_G.HeadSize, _G.HeadSize, _G.HeadSize)
-                        v.Character.HumanoidRootPart.Transparency = 0.7
-                        v.Character.HumanoidRootPart.BrickColor = BrickColor.new("Really blue")
-                        v.Character.HumanoidRootPart.Material = "Neon"
-                        v.Character.HumanoidRootPart.CanCollide = false
-                    end)
+-- Add a button to hide the GUI
+SpeedTab:AddButton('Hide GUI', hideMainGUI)
+
+-- Add a tabbox for hitbox settings
+local HitboxTabbox = MainTab:AddLeftTabbox('Hitbox')
+
+-- Add a tab to the hitbox tabbox for hitbox settings
+local HitboxTab = HitboxTabbox:AddTab('Hitbox Settings')
+
+-- Add a textbox to enter hitbox size
+local HitboxInput = HitboxTab:AddInput('HitboxInput', {
+    Default = '5',
+    Numeric = true,
+    Finished = false,
+    Text = 'Enter Hitbox Size',
+    Tooltip = 'Set the hitbox size for other players',
+})
+
+-- Add a button to apply hitbox size and render through walls
+HitboxTab:AddButton('Apply Hitbox (ESP)', function()
+    local size = HitboxInput.Value
+    _G.HeadSize = tonumber(size)
+    for _, player in ipairs(game:GetService('Players'):GetPlayers()) do
+        if player.Name ~= game.Players.LocalPlayer.Name then
+            pcall(function()
+                local rootPart = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+                if rootPart then
+                    rootPart.Size = Vector3.new(_G.HeadSize, _G.HeadSize, _G.HeadSize)
+                    rootPart.Transparency = 0.7
+                    rootPart.BrickColor = BrickColor.new("Really blue")
+                    rootPart.Material = "Neon"
+                    rootPart.CanCollide = false
                 end
+            end)
+        end
+    end
+end)
+
+-- Add a tabbox for ESP settings
+local ESPTabbox = MainTab:AddRightTabbox('ESP')
+
+-- Add a tab to the ESP tabbox for ESP settings
+local ESPTab = ESPTabbox:AddTab('ESP Settings')
+
+-- Add a toggle to enable/disable ESP
+local EnableESP = ESPTab:AddToggle('EnableESP', {
+    Text = 'Enable ESP',
+    Default = false,
+    Tooltip = 'Toggle ESP to locate players',
+})
+
+-- Function to create ESP for players
+local function createESP(player)
+    if player.Character and not player.Character:FindFirstChild("ESPBox") then
+        local box = Instance.new("BoxHandleAdornment")
+        box.Name = "ESPBox"
+        box.Adornee = player.Character:WaitForChild("HumanoidRootPart")
+        box.AlwaysOnTop = true
+        box.ZIndex = 5
+        box.Size = player.Character.HumanoidRootPart.Size + Vector3.new(1, 1, 1)
+        box.Transparency = 0.7
+        box.Color3 = Color3.new(1, 0, 0) -- Red color
+        box.Parent = player.Character.HumanoidRootPart
+    end
+end
+
+-- Function to remove ESP from players
+local function removeESP(player)
+    if player.Character and player.Character:FindFirstChild("ESPBox") then
+        player.Character:FindFirstChild("ESPBox"):Destroy()
+    end
+end
+
+-- Toggle ESP functionality
+EnableESP:OnChanged(function()
+    if EnableESP.Value then
+        for _, player in ipairs(game:GetService('Players'):GetPlayers()) do
+            if player ~= game.Players.LocalPlayer then
+                createESP(player)
             end
         end
-    else
-        print("Invalid hitbox size input!")
-    end
-end, 150)
-
--- ESP tab content
-createSectionHeader(espContent, "ESP Settings", 0)
-createRoundButton(espContent, "T to Enable", function()
-    _G.Disabled = not _G.Disabled
-    if not _G.Disabled then
-        for i, v in next, game:GetService('Players'):GetPlayers() do
-            if v.Name ~= game:GetService('Players').LocalPlayer.Name then
-                pcall(function()
-                    v.Character.Head.Size = Vector3.new(_G.HeadSize, _G.HeadSize, _G.HeadSize)
-                    v.Character.Head.Transparency = 0.7
-                    v.Character.Head.BrickColor = BrickColor.new("Really blue")
-                    v.Character.Head.Material = "Neon"
-                    v.Character.Head.CanCollide = false
+        game:GetService('Players').PlayerAdded:Connect(function(player)
+            if player ~= game.Players.LocalPlayer then
+                player.CharacterAdded:Connect(function()
+                    createESP(player)
                 end)
             end
+        end)
+    else
+        for _, player in ipairs(game:GetService('Players'):GetPlayers()) do
+            if player ~= game.Players.LocalPlayer then
+                removeESP(player)
+            end
         end
     end
-end, 50)
+end)
 
--- Hitbox expanding logic
-_G.HeadSize = 35
+-- Add a tabbox for Fly settings aligned with ESP on the right side
+local FlyTabbox = ESPTabbox:AddRightTabbox('Fly')
+
+-- Add a tab to the Fly tabbox for Fly settings
+local FlyTab = FlyTabbox:AddTab('Fly Settings')
+
+-- Add a button to toggle Fly
+FlyTab:AddButton('Toggle Fly', function()
+    local player = game.Players.LocalPlayer
+    local character = player.Character
+    local humanoid = character and character:FindFirstChild("Humanoid")
+    if humanoid then
+        humanoid.PlatformStand = not humanoid.PlatformStand
+    end
+end)
+
+-- Replace ESP functionality with rendering through walls
+_G.HeadSize = 5
 _G.Disabled = true
 
 game:GetService('RunService').RenderStepped:Connect(function()
-    if not _G.Disabled then
-        for i, v in next, game:GetService('Players'):GetPlayers() do
-            if v.Name ~= game:GetService('Players').LocalPlayer.Name then
+    if _G.Disabled then
+        for _, player in ipairs(game:GetService('Players'):GetPlayers()) do
+            if player.Name ~= game:GetService('Players').LocalPlayer.Name then
                 pcall(function()
-                    v.Character.HumanoidRootPart.Size = Vector3.new(_G.HeadSize, _G.HeadSize, _G.HeadSize)
-                    v.Character.HumanoidRootPart.Transparency = 0.7
-                    v.Character.HumanoidRootPart.BrickColor = BrickColor.new("Really blue")
-                    v.Character.HumanoidRootPart.Material = "Neon"
-                    v.Character.HumanoidRootPart.CanCollide = false
+                    local rootPart = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+                    if rootPart then
+                        rootPart.Size = Vector3.new(_G.HeadSize, _G.HeadSize, _G.HeadSize)
+                        rootPart.Transparency = 0.7
+                        rootPart.BrickColor = BrickColor.new("Really blue")
+                        rootPart.Material = "Neon"
+                        rootPart.CanCollide = false
+                    end
                 end)
             end
         end
     end
 end)
 
--- Toggle visibility of GUI with 'H' key
-local function toggleGuiVisibility()
-    gui.Enabled = not gui.Enabled
+-- Apply initial settings and start maintaining speed
+Library:SetWatermarkVisibility(true)
+Library:SetWatermark('GPO BR')
+
+ThemeManager:SetLibrary(Library)
+SaveManager:SetLibrary(Library)
+
+ThemeManager:ApplyToTab(Window)
+SaveManager:LoadAutoloadConfig()
+
+local function maintainSpeed()
+    while true do
+        local player = game.Players.LocalPlayer
+        local character = player.Character
+        if character then
+            local humanoid = character:FindFirstChild("Humanoid")
+            if humanoid and _G.WalkSpeed then
+                if humanoid.WalkSpeed ~= _G.WalkSpeed then
+                    humanoid.WalkSpeed = _G.WalkSpeed
+                end
+            end
+        end
+        wait(1) -- Check every second
+    end
 end
 
-game:GetService("UserInputService").InputBegan:Connect(function(input)
-    if input.KeyCode == Enum.KeyCode.H then
-        toggleGuiVisibility()
-    end
-end)
+spawn(maintainSpeed)  -- Start maintaining speed in a separate thread
 
--- Hide the initializing GUI after 2 seconds
-wait(2)
-initializingGui:Destroy()
+-- Ensure GUI starts as visible
+Window:SetVisible(true)

@@ -218,23 +218,23 @@ local HitboxInput = HitboxTab:AddInput('HitboxInput', {
 
 HitboxTab:AddButton('Apply Hitbox (ESP)', function()
     local size = HitboxInput.Value
-    _G.HeadSize = tonumber(size)
+    _G.TorsoSize = tonumber(size)
     for _, player in ipairs(game:GetService('Players'):GetPlayers()) do
         if player.Name ~= game.Players.LocalPlayer.Name then
             pcall(function()
-                local rootPart = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
-                if rootPart then
-                    rootPart.Size = Vector3.new(_G.HeadSize, _G.HeadSize, _G.HeadSize)
-                    rootPart.Transparency = 0.7
-                    rootPart.BrickColor = BrickColor.new("Really blue")
-                    rootPart.Material = "Neon"
-                    rootPart.CanCollide = false
+                local character = player.Character
+                local torso = character and (character:FindFirstChild("UpperTorso") or character:FindFirstChild("Torso"))
+                if torso then
+                    torso.Size = Vector3.new(_G.TorsoSize, _G.TorsoSize, _G.TorsoSize)
+                    torso.Transparency = 0.7
+                    torso.BrickColor = BrickColor.new("Really blue")
+                    torso.Material = "Neon"
+                    torso.CanCollide = false
                 end
             end)
         end
     end
 end)
-
 -- Add a tabbox for ESP settings
 
 local ESPTabbox = GPOTab:AddRightTabbox('ESP')
